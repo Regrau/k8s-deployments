@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: generic-app
+  labels:
+    app: generic-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: generic-app
+      labels:
+        app: generic-app
+    spec:
+      containers:
+        - name: generic-app
+          image: reg.localhost:5000/generic-symfony:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+              name: php-fpm
+        - name: webserver
+          image: nginx:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d
+              name: nginx-config-volume
+          ports:
+            - containerPort: 8080
+              name: webserver
+      volumes:
+        - name: nginx-config-volume
+          configMap:
+            name: nginx-config
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: generic-app
