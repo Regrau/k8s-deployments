@@ -1,0 +1,24 @@
+---
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  name: multi-node-cluster
+servers: 1
+agents: 2
+image: docker.io/rancher/k3s:v1.23.6-k3s1
+ports:
+  - port: 8080:80
+    nodeFilters:
+      - loadbalancer
+  - port: 8443:443
+    nodeFilters:
+      - loadbalancer
+registries:
+  create:
+    name: reg.localhost
+    host: "0.0.0.0"
+    hostPort: "5000"
+volumes:
+  - volume: "${PWD}/custom-charts:/var/lib/rancher/k3s/server/manifests/custom-charts"
+    nodeFilters:
+      - server:0
